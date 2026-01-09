@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Match Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a0a0c0;
+            margin-bottom: 20px;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .colors-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .colors-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        
+        .color-box {
+            width: 200px;
+            height: 200px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease;
+        }
+        
+        .color-box:hover {
+            transform: scale(1.05);
+        }
+        
+        .target-color {
+            background-color: rgb(120, 80, 200);
+        }
+        
+        .player-color {
+            background-color: rgb(120, 80, 200);
+        }
+        
+        .color-label {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #e0e0ff;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            width: 100%;
+        }
+        
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            color: #e0e0ff;
+        }
+        
+        .slider-label span {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .red-label { color: #ff6b6b; }
+        .green-label { color: #51cf66; }
+        .blue-label { color: #339af0; }
+        
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 12px;
+            border-radius: 10px;
+            outline: none;
+        }
+        
+        .red-slider {
+            background: linear-gradient(to right, #000, #ff6b6b);
+        }
+        
+        .green-slider {
+            background: linear-gradient(to right, #000, #51cf66);
+        }
+        
+        .blue-slider {
+            background: linear-gradient(to right, #000, #339af0);
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            border: 2px solid #1a1a2e;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .score {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #feb47b;
+        }
+        
+        .difference {
+            font-size: 1.2rem;
+            color: #a0a0c0;
+        }
+        
+        .difference-value {
+            font-weight: 700;
+            color: #51cf66;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        button {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .check-btn {
+            background: linear-gradient(to right, #51cf66, #40c057);
+            color: white;
+        }
+        
+        .new-color-btn {
+            background: linear-gradient(to right, #339af0, #228be6);
+            color: white;
+        }
+        
+        .reset-btn {
+            background: linear-gradient(to right, #ff6b6b, #fa5252);
+            color: white;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .instructions h3 {
+            color: #feb47b;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .instructions p {
+            color: #c0c0e0;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ul {
+            color: #c0c0e0;
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .match-message {
+            font-size: 1.5rem;
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+            font-weight: 700;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .perfect-match {
+            background-color: rgba(81, 207, 102, 0.2);
+            color: #51cf66;
+            opacity: 1;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            color: #a0a0c0;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-palette"></i> Color Match</h1>
+            <p class="subtitle">Adjust the RGB sliders to match the target color as closely as possible!</p>
+        </header>
+        
+        <div class="game-area">
+            <div class="colors-container">
+                <div>
+                    <div class="color-box target-color" id="targetColor"></div>
+                    <div class="color-label">Target Color</div>
+                </div>
+                <div>
+                    <div class="color-box player-color" id="playerColor"></div>
+                    <div class="color-label">Your Color</div>
+                </div>
+            </div>
+            
+            <div class="match-message" id="matchMessage"></div>
+            
+            <div class="controls">
+                <div class="slider-container">
+                    <div class="slider-label red-label">
+                        <span>Red</span>
+                        <span id="redValue">120</span>
+                    </div>
+                    <input type="range" min="0" max="255" value="120" class="slider red-slider" id="redSlider">
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-label green-label">
+                        <span>Green</span>
+                        <span id="greenValue">80</span>
+                    </div>
+                    <input type="range" min="0" max="255" value="80" class="slider green-slider" id="greenSlider">
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-label blue-label">
+                        <span>Blue</span>
+                        <span id="blueValue">200</span>
+                    </div>
+                    <input type="range" min="0" max="255" value="200" class="slider blue-slider" id="blueSlider">
+                </div>
+                
+                <div class="game-info">
+                    <div>
+                        <div class="score">Score: <span id="score">0</span></div>
+                        <div class="difference">Difference: <span class="difference-value" id="difference">0</span></div>
+                    </div>
+                    
+                    <div class="buttons">
+                        <button class="check-btn" id="checkBtn">
+                            <i class="fas fa-check-circle"></i> Check Match
+                        </button>
+                        <button class="new-color-btn" id="newColorBtn">
+                            <i class="fas fa-random"></i> New Color
+                        </button>
+                        <button class="reset-btn" id="resetBtn">
+                            <i class="fas fa-redo"></i> Reset Game
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> How to Play</h3>
+            <p>Your goal is to match the target color by adjusting the Red, Green, and Blue sliders.</p>
+            <ul>
+                <li>Use the RGB sliders to change your color</li>
+                <li>Click "Check Match" to see how close you are</li>
+                <li>Lower difference means better match (perfect = 0)</li>
+                <li>Get a perfect match to earn 10 points</li>
+                <li>Get a close match (difference &lt; 30) to earn 5 points</li>
+                <li>Click "New Color" for a new target color</li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <p>Color Match Game | Made with <i class="fas fa-heart" style="color: #ff6b6b;"></i> for frontend fun</p>
+        </div>
+    </div>
+
+    <script>
+        // Game elements
+        const targetColorBox = document.getElementById('targetColor');
+        const playerColorBox = document.getElementById('playerColor');
+        const redSlider = document.getElementById('redSlider');
+        const greenSlider = document.getElementById('greenSlider');
+        const blueSlider = document.getElementById('blueSlider');
+        const redValue = document.getElementById('redValue');
+        const greenValue = document.getElementById('greenValue');
+        const blueValue = document.getElementById('blueValue');
+        const scoreElement = document.getElementById('score');
+        const differenceElement = document.getElementById('difference');
+        const matchMessage = document.getElementById('matchMessage');
+        const checkBtn = document.getElementById('checkBtn');
+        const newColorBtn = document.getElementById('newColorBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        // Game variables
+        let score = 0;
+        let targetRed, targetGreen, targetBlue;
+        
+        // Initialize the game
+        function initGame() {
+            score = 0;
+            scoreElement.textContent = score;
+            generateNewTargetColor();
+            updatePlayerColor();
+            matchMessage.textContent = '';
+            matchMessage.classList.remove('perfect-match');
+        }
+        
+        // Generate a random target color
+        function generateNewTargetColor() {
+            targetRed = Math.floor(Math.random() * 256);
+            targetGreen = Math.floor(Math.random() * 256);
+            targetBlue = Math.floor(Math.random() * 256);
+            
+            targetColorBox.style.backgroundColor = `rgb(${targetRed}, ${targetGreen}, ${targetBlue})`;
+        }
+        
+        // Update player color based on slider values
+        function updatePlayerColor() {
+            const red = parseInt(redSlider.value);
+            const green = parseInt(greenSlider.value);
+            const blue = parseInt(blueSlider.value);
+            
+            playerColorBox.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
+            
+            redValue.textContent = red;
+            greenValue.textContent = green;
+            blueValue.textContent = blue;
+        }
+        
+        // Calculate the difference between target and player colors
+        function calculateDifference() {
+            const playerRed = parseInt(redSlider.value);
+            const playerGreen = parseInt(greenSlider.value);
+            const playerBlue = parseInt(blueSlider.value);
+            
+            const diffRed = Math.abs(targetRed - playerRed);
+            const diffGreen = Math.abs(targetGreen - playerGreen);
+            const diffBlue = Math.abs(targetBlue - playerBlue);
+            
+            return diffRed + diffGreen + diffBlue;
+        }
+        
+        // Check the match and update score
+        function checkMatch() {
+            const difference = calculateDifference();
+            differenceElement.textContent = difference;
+            
+            // Clear any previous message
+            matchMessage.textContent = '';
+            matchMessage.classList.remove('perfect-match');
+            
+            let pointsEarned = 0;
+            let message = '';
+            
+            if (difference === 0) {
+                pointsEarned = 10;
+                message = 'Perfect Match! +10 points!';
+                matchMessage.classList.add('perfect-match');
+            } else if (difference < 30) {
+                pointsEarned = 5;
+                message = 'Very Close! +5 points!';
+                matchMessage.classList.add('perfect-match');
+            } else if (difference < 100) {
+                pointsEarned = 2;
+                message = 'Good try! +2 points!';
+            } else {
+                message = 'Keep trying!';
+            }
+            
+            // Update score and display message
+            score += pointsEarned;
+            scoreElement.textContent = score;
+            matchMessage.textContent = message;
+            
+            // Show message temporarily
+            setTimeout(() => {
+                if (difference !== 0 && difference >= 100) {
+                    matchMessage.textContent = '';
+                }
+            }, 2000);
+        }
+        
+        // Event listeners for sliders
+        redSlider.addEventListener('input', updatePlayerColor);
+        greenSlider.addEventListener('input', updatePlayerColor);
+        blueSlider.addEventListener('input', updatePlayerColor);
+        
+        // Event listeners for buttons
+        checkBtn.addEventListener('click', checkMatch);
+        
+        newColorBtn.addEventListener('click', () => {
+            generateNewTargetColor();
+            matchMessage.textContent = '';
+            matchMessage.classList.remove('perfect-match');
+            differenceElement.textContent = '0';
+        });
+        
+        resetBtn.addEventListener('click', initGame);
+        
+        // Initialize the game
+        initGame();
+        
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Space to check match
+            if (e.code === 'Space') {
+                e.preventDefault();
+                checkMatch();
+            }
+            
+            // N for new color
+            if (e.code === 'KeyN') {
+                e.preventDefault();
+                generateNewTargetColor();
+                matchMessage.textContent = '';
+                matchMessage.classList.remove('perfect-match');
+                differenceElement.textContent = '0';
+            }
+            
+            // R to reset game
+            if (e.code === 'KeyR') {
+                e.preventDefault();
+                initGame();
+            }
+        });
+    </script>
+</body>
+</html>
